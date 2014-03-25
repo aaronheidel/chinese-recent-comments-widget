@@ -1,4 +1,3 @@
-
 /*
  * <script style=text/javascript src="http://helplogger.googlecode.com/svn/trunk/recent comments
  * widget.js"></script><script style=text/javascript >var a_rc=5;var m_rc=false;var n_rc=true;var
@@ -18,10 +17,7 @@
  */
 
 function showrecentcomments(json) {
-	document.write('Blah blah blah');
-}
-/*
-	for (var i = 0; i < a_rc; i++) {
+	 for (var i = 0; i < a_rc; i++) {
 		var rc_entry = json.feed.entry[i];   // rc_entry is current entry
 		var post_url;
 		if (i == json.feed.entry.length)
@@ -97,4 +93,4 @@ function showrecentcomments(json) {
     	}
 	}
 }
-*/
+
