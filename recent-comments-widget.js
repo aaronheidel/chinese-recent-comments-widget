@@ -15,6 +15,16 @@
  * m_rc: display comment dates?
  * n_rc: display post titles?
  */
+ 
+function metest() {
+  document.write('<div class="rcw-comments">');
+  document.write('On some day ');
+  document.write('<span class="author-rc">This Person</span> 回應');
+  document.write(': ');
+  document.write('<i>&#8220;');
+  document.write('Contents of comment blah blah blah');
+  document.write('&#8221;</i></div>');
+ }
 
 function showrecentcomments(json) {
 	 for (var i = 0; i < a_rc; i++) {
