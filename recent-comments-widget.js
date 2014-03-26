@@ -1,31 +1,3 @@
-/*
- * <script style=text/javascript src="http://helplogger.googlecode.com/svn/trunk/recent comments
- * widget.js"></script><script style=text/javascript >var a_rc=5;var m_rc=false;var n_rc=true;var
- * o_rc=100;</script><script
- * src=http://jeanheidel.blogspot.com/feeds/comments/default?alt=json-in-script&callback=showrecentcomments
- * ></script><span id=rcw-cr><a
- * href=http://helplogger.blogspot.com/2012/03/recent-comments-widget-for-blogger.html>Recent
- * Comments Widget</a></span><style type=text/css> .rcw-comments a {text-transform: capitalize;}
- * .rcw-comments {border-bottom: 1px dotted; padding-top: 7px!important; padding-bottom:
- * 7px!important;} #rcw-cr {font-family: Arial,Tahoma;font-size:9px;padding-top:7px;display:block;}
- * </style>
- *
- * a_rc: display this many comments
- * o_rc: display this many characters from comment body
- * m_rc: display comment dates?
- * n_rc: display post titles?
- */
- 
-function metest() {
-  document.write('<div class="rcw-comments">');
-  document.write('On some day ');
-  document.write('<span class="author-rc">This Person</span> 回應');
-  document.write(': ');
-  document.write('<i>&#8220;');
-  document.write('Contents of comment blah blah blah');
-  document.write('&#8221;</i></div>');
- }
- 
 function summarize_comment(comment, chars) {
 	if (chars > 0 && comment.length > chars)
 //		comment = comment.substring(0, chars) + '&hellip;';
@@ -56,7 +28,7 @@ function get_comment_link(entry) {
 	var url = '';
 	for (var i = 0; i < entry.link.length; i++) {
 		if (entry.link[i].rel == 'alternate') {
-			return entry.link[i].href;   // post_url is href to comment (http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572#c646752016000786413)
+			return entry.link[i].href;   // post_url is href to comment (http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572#c646752016000786413)
 		}
 	}
 	return url;
@@ -77,11 +49,11 @@ function showrecentcomments(json) {
 			break;
 		var post_url = get_comment_link(rc_entry);
 		var comment_url = post_url.split("#");
-		   // yields comment_url[0] = "http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572"
+		   // yields comment_url[0] = "http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572"
 		   //        comment_url[1] = "c646752016000786413"
 		comment_url = comment_url[0];                   // yields top of entry page containing comment
 		var post_link = extract_post_title_from_url(comment_url).link(comment_url);
-          // <a href="http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572">blog post_20</a>
+          // <a href="http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572">blog post_20</a>
 		if ("content" in rc_entry) {
 			var contents = rc_entry.content.$t;   // contents of comment
 		} else if ("summary" in rc_entry) {
