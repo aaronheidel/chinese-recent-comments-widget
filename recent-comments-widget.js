@@ -25,82 +25,95 @@ function metest() {
   document.write('Contents of comment blah blah blah');
   document.write('&#8221;</i></div>');
  }
-
-function showrecentcomments(json) {
-	 for (var i = 0; i < a_rc; i++) {
-		var rc_entry = json.feed.entry[i];   // rc_entry is current entry
-		var post_url;
-		if (i == json.feed.entry.length)
-			break;
-		for (var k = 0; k < rc_entry.link.length; k++) {
-			if (rc_entry.link[k].rel == 'alternate') {
-				post_url = rc_entry.link[k].href;   // post_url is href to comment (http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572#c646752016000786413)
-				break;
-			}
-		}
-		post_url = post_url.replace("#","#");  // is this a no-op?
-		var d_rc = post_url.split("#");   // yields d_rc[0] = "http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572"
-		                                  //        d_rc[1] = "c646752016000786413"
-		d_rc = d_rc[0];                   // yields top of entry page containing comment
-		var e_rc = d_rc.split("/");       // yields e_rc[0] = "http:"
-		                                  //        e_rc[1] = ""
-		                                  //        e_rc[2] = "jeanheidel.blogspot.com"
-		                                  //        e_rc[3] = "2013"
-		                                  //        e_rc[4] = "01
-		                                  //        e_rc[5] = "blog-post_20.html?showComment=1395647023572"
-		e_rc = e_rc[5];                     // blog-post_20.html?showComment=1395647023572
-		e_rc = e_rc.split(".html");         // blog-post_20  ?showComment=1395647023572
-		e_rc = e_rc[0];                     // blog-post_20
-		var f_rc = e_rc.replace(/-/g," ");  // blog post_20
-		f_rc = f_rc.link(d_rc);
-		var g_rc = rc_entry.published.$t;
-		var h_rc = g_rc.substring(0,4);
-		var i_rc = g_rc.substring(5,7);
-		var j_rc = g_rc.substring(8,10);
-		var k_rc = new Array();
-		k_rc[1] = "Jan";
-		k_rc[2] = "Feb";
-		k_rc[3] = "Mar";
-		k_rc[4] = "Apr";
-		k_rc[5] = "May";
-		k_rc[6] = "Jun";
-		k_rc[7] = "Jul";
-		k_rc[8] = "Aug";
-		k_rc[9] = "Sep";
-		k_rc[10]= "Oct";
-		k_rc[11]= "Nov";
-		k_rc[12]= "Dec";
-		if ("content" in rc_entry) {
-			var l_rc=rc_entry.content.$t;
-		} else if ("summary" in rc_entry) {
-			var l_rc=rc_entry.summary.$t;
-		} else 
-			var l_rc="";
-		var re=/<\S[^>]*>/g;
-		l_rc=l_rc.replace(re,"");
-		document.write('<div class="rcw-comments">');
-		if (m_rc==true)
-			document.write('On '+k_rc[parseInt(i_rc,10)]+' '+j_rc+' ');
-		document.write('<span class="author-rc"><a href="'+post_url+'">'+rc_entry.author[0].name.$t+'</a></span> 回應');
-		if(n_rc==true)
-			document.write(' on '+f_rc);
-		if(o_rc==0) {
-			document.write('</div>');
-		} else {
-			document.write(': ');
-			if (l_rc.length<o_rc) {
-				document.write('<i>&#8220;');
-				document.write(l_rc);
-				document.write('&#8221;</i></div>');
-			} else {
-				document.write('<i>&#8220;');
-				l_rc=l_rc.substring(0,o_rc);
-				var p_rc=l_rc.lastIndexOf(" ");
-				l_rc=l_rc.substring(0,p_rc);
-				document.write(l_rc+'&hellip;&#8221;</i></div>');
-				document.write('');
-			}
-    	}
-	}
+ 
+function summarize_comment(comment, chars) {
+	if (chars > 0 && comment.length > chars)
+//		comment = comment.substring(0, chars) + '&hellip;';
+		comment = comment.substring(0, chars) + '&nbsp;-';
+	return comment;
 }
 
+function humanize_datetime(timestamp) {
+	// timestamp = "2014-03-24T15:43:43.572+08:00"
+	var yyyy = timestamp.substring(0,4);   // 2014
+	var mm = timestamp.substring(5,7).replace(/^0+/, ''); // 3
+	var dd = timestamp.substring(8,10);    // 24
+	var hh  = timestamp.substring(11,13);  // 15
+	var min = timestamp.substring(14,16);  // 43
+	var sec = timestamp.substring(17,23);  // 43.572
+	var time = mm + '/' + dd + ' ';
+	var am = true;
+	if (hh > 12) {
+		am = false;
+		hh -= 12;
+	} else {
+	}
+	time += hh + ':' + min + (am ? 'am' : 'pm');
+	return time;
+}
+
+function get_comment_link(entry) {
+	var url = '';
+	for (var i = 0; i < entry.link.length; i++) {
+		if (entry.link[i].rel == 'alternate') {
+			return entry.link[i].href;   // post_url is href to comment (http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572#c646752016000786413)
+		}
+	}
+	return url;
+}
+
+function extract_post_title_from_url(url) {
+	var title = url.split("/");       // [0] = "http:", ...
+	title = title[5];              // blog-post_20.html?showComment=1395647023572
+	title = title.split(".html");  // blog-post_20  ?showComment=1395647023572
+	title = title[0];              // blog-post_20
+	return title.replace(/-/g," ");  // blog post_20
+}
+
+function showrecentcomments(json) {
+	for (var i = 0; i < rc_comment_count; i++) {
+		var rc_entry = json.feed.entry[i];   // rc_entry is current entry
+		if (i == json.feed.entry.length)
+			break;
+		var post_url = get_comment_link(rc_entry);
+		var comment_url = post_url.split("#");
+		   // yields comment_url[0] = "http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572"
+		   //        comment_url[1] = "c646752016000786413"
+		comment_url = comment_url[0];                   // yields top of entry page containing comment
+		var post_link = extract_post_title_from_url(comment_url).link(comment_url);
+          // <a href="http://jeanheidel.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572">blog post_20</a>
+		if ("content" in rc_entry) {
+			var contents = rc_entry.content.$t;   // contents of comment
+		} else if ("summary" in rc_entry) {
+			var contents = rc_entry.summary.$t;
+		} else 
+			var contents = "";
+		var regex = /<\S[^>]*>/g;               // catches any HTML tag
+		contents = contents.replace(regex,"");          // erase HTML tags
+
+		// replace author name if necessary with 版主 or 匿名
+		var comment_author = rc_entry.author[0].name.$t;
+		if (comment_author == json.feed.author[0].name.$t) comment_author = '版主';
+		if (comment_author == 'Anonymous') comment_author = '匿名';
+
+		document.write('<div class="rcw-comments">');
+		// write comment
+		if(rc_comment_chars > 0) {
+			document.write('<a href="'+post_url+'"><i>');
+			document.write( summarize_comment(contents, rc_comment_chars) );
+			document.write('</i></a>');
+    	}
+
+		// write author (if no comment is shown, make the author's name a link)
+		document.write(' <span class="author-rc">');
+		if (rc_comment_chars == 0) document.write('<a href="'+post_url+'">');
+		document.write(comment_author);
+		if (rc_comment_chars == 0) document.write('</a>');
+		document.write('</span>');
+
+		// write date/time
+		if (rc_show_datetime == true)  // display comment date?
+			document.write(' ' + humanize_datetime(rc_entry.published.$t));
+		document.write('</div>');
+	}
+}
