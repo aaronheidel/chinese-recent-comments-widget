@@ -71,9 +71,11 @@ function showrecentcomments(json) {
 		document.write('<div class="rcw-comments">');
 		// write comment
 		if(rc_comment_chars > 0) {
-			document.write('<a href="'+post_url+'"><i>');
+			document.write('<a href="'+post_url+'">');
+      if (rc_comment_italics) document.write('<i>');
 			document.write( summarize_comment(contents, rc_comment_chars) );
-			document.write('</i></a>');
+			if (rc_comment_italics) document.write('</i>');
+      document.write('</a>');
     	}
 
 		// write author (if no comment is shown, make the author's name a link)
