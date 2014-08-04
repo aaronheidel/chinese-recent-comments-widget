@@ -66,6 +66,7 @@ function showrecentcomments(json) {
 		// replace author name if necessary with 版主 or 匿名
 		var comment_author = rc_entry.author[0].name.$t;
 		if (comment_author == json.feed.author[0].name.$t) comment_author = '版主';
+    if (comment_author == json.feed.title.$t) comment_author = '版主';
 		if (comment_author == 'Anonymous') comment_author = '匿名';
 
 		document.write('<div class="rcw-comments">');
