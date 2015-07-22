@@ -1,2 +1,2 @@
 # chinese-recent-comments-widget
-Mandarin Recent comments widget for Blogger
+Mandarin recent comments widget for Blogger
