@@ -7,6 +7,7 @@ function summarize_comment(comment, chars) {
 
 function humanize_datetime(timestamp) {
 	// timestamp = "2014-03-24T15:43:43.572+08:00"
+	// returns "3/24 3:43pm"
 	var yyyy = timestamp.substring(0,4);   // 2014
 	var mm = timestamp.substring(5,7).replace(/^0+/, ''); // 3
 	var dd = timestamp.substring(8,10);    // 24
@@ -31,6 +32,7 @@ function get_comment_link(entry) {
 			return entry.link[i].href;   // post_url is href to comment (http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572#c646752016000786413)
 		}
 	}
+	// if the comment was deleted, it will have no alternate link
 	return url;
 }
 
@@ -43,17 +45,32 @@ function extract_post_title_from_url(url) {
 }
 
 function showrecentcomments(json) {
+	//	document.write('rc_comment_count=' + rc_comment_count + '</br>');
+	//	document.write('rc_comment_chars=' + rc_comment_chars + '</br>');
+	//	document.write('rc_show_datetime=' + rc_show_datetime + '</br>');
+	//	document.write('rc_show_titles=' + rc_show_titles + '</br>');
+	//	document.write('rc_comment_italics=' + rc_comment_italics + '</br>');
+	//	document.write('json.feed.entry.length=' + json.feed.entry.length + '</br>');
+
 	for (var i = 0; i < rc_comment_count; i++) {
+	//	document.write('i=' + i + '</br>');
 		var rc_entry = json.feed.entry[i];   // rc_entry is current entry
 		if (i == json.feed.entry.length)
 			break;
 		var post_url = get_comment_link(rc_entry);
+
+		// if post_url is empty, skip this comment
+		if (post_url == '') {
+			rc_comment_count++;
+			continue;
+		}
+
 		var comment_url = post_url.split("#");
 		   // yields comment_url[0] = "http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572"
 		   //        comment_url[1] = "c646752016000786413"
 		comment_url = comment_url[0];                   // yields top of entry page containing comment
 		var post_link = extract_post_title_from_url(comment_url).link(comment_url);
-          // <a href="http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572">blog post_20</a>
+		                // <a href="http://myblog.blogspot.com/2013/01/blog-post_20.html?showComment=1395647023572">blog post_20</a>
 		if ("content" in rc_entry) {
 			var contents = rc_entry.content.$t;   // contents of comment
 		} else if ("summary" in rc_entry) {
@@ -66,18 +83,18 @@ function showrecentcomments(json) {
 		// replace author name if necessary with 版主 or 匿名
 		var comment_author = rc_entry.author[0].name.$t;
 		if (comment_author == json.feed.author[0].name.$t) comment_author = '版主';
-    if (comment_author == json.feed.title.$t) comment_author = '版主';
+		if (comment_author == json.feed.title.$t) comment_author = '版主';
 		if (comment_author == 'Anonymous') comment_author = '匿名';
 
 		document.write('<div class="rcw-comments">');
 		// write comment
 		if(rc_comment_chars > 0) {
-			document.write('<a href="'+post_url+'">');
-      if (rc_comment_italics) document.write('<i>');
+			document.write('<a href="' + post_url + '">');
+			if (rc_comment_italics) document.write('<i>');
 			document.write( summarize_comment(contents, rc_comment_chars) );
 			if (rc_comment_italics) document.write('</i>');
-      document.write('</a>');
-    	}
+			document.write('</a>');
+		}
 
 		// write author (if no comment is shown, make the author's name a link)
 		document.write(' <span class="author-rc">');
