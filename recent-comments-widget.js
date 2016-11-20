@@ -54,6 +54,7 @@ function showrecentcomments(json) {
 
 	if (1) {
 		document.write('<div class="rcw-comments">');
+		document.write('Blah!</p>');
 		document.write('</div>');
 	} else {
 		for (var i = 0; i < rc_comment_count; i++) {
